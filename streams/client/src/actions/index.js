@@ -22,12 +22,15 @@ export const signOut = () => {
   };
 };
 
-// Using a redux thunk middleware to handle create an async action creator
+// Using redux thunk middleware to handle create an async action creator
 export const createStream = (formValues) => {
-  return async (dispatch) => {
-    const res = await streams.post("/streams", formValues);
+  return async (dispatch, getState) => {
+    const { userId } = getState().auth;
+    const res = await streams.post("/streams", { ...formValues, userId });
 
     dispatch({ type: CREATE_STREAM, payload: res.data });
+
+    // Do some programmatic navigation to get the user back to the root route
   };
 };
 
@@ -51,7 +54,7 @@ export const editStream = (id, formValues) => {
   return async (dispatch) => {
     const res = await streams.put(`/streams/${id}`, formValues);
 
-    dispatch({ type: "EDIT_STREAM", payload: res.data });
+    dispatch({ type: EDIT_STREAM, payload: res.data });
   };
 };
 
@@ -59,6 +62,6 @@ export const deleteStream = (id) => {
   return async (dispatch) => {
     await streams.delete(`/streams/${id}`);
 
-    dispatch({ type: "DELETE_STREAM", payload: id });
+    dispatch({ type: DELETE_STREAM, payload: id });
   };
 };
